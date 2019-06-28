@@ -44,9 +44,7 @@ const posts = [
   }
 ];
 
-const Post = ({ post }) => {
-  const [liked, setLiked] = React.useState(false);
-
+const Post = ({ post, onToggleLike, liked }) => {
   return (
     <article className="card post" key={post.id}>
       <div className="card-title">
@@ -67,7 +65,7 @@ const Post = ({ post }) => {
       )}
       <div className="card-actions">
         <button
-          onClick={() => setLiked(!liked)}
+          onClick={onToggleLike}
           type="button"
           className={liked ? 'button button-liked' : 'button'}
         >
@@ -78,13 +76,47 @@ const Post = ({ post }) => {
   );
 };
 
-const Feed = ({ posts }) => (
-  <div className="feed">
-    {posts.map(post => (
-      <Post post={post} />
-    ))}
-  </div>
-);
+const Feed = ({ posts }) => {
+  const [likedPosts, setLikedPosts] = React.useState([]);
+
+  function toggleLikePost(postId) {
+    if (likedPosts.includes(postId)) {
+      setLikedPosts(likedPosts.filter(id => id !== postId));
+    } else {
+      setLikedPosts(likedPosts.concat(postId));
+    }
+  }
+
+  function likeAll() {
+    setLikedPosts(posts.map(post => post.id));
+  }
+
+  return (
+    <>
+      <div className="card ads-card">
+        <div className="card-small-title">Exclusive Features for You!</div>
+        <button
+          onClick={likeAll}
+          id="like-all-btn"
+          className="btn"
+          type="button"
+        >
+          Like All Posts
+        </button>
+      </div>
+      <div className="feed">
+        {posts.map(post => (
+          <Post
+            post={post}
+            liked={likedPosts.includes(post.id)}
+            onToggleLike={() => toggleLikePost(post.id)}
+            key={post.id}
+          />
+        ))}
+      </div>
+    </>
+  );
+};
 
 const BugForm = () => {
   const [name, setName] = React.useState('');
@@ -168,4 +200,4 @@ const BugForm = () => {
 };
 
 const rootElement = document.getElementById('root');
-ReactDOM.render(<BugForm />, rootElement);
+ReactDOM.render(<Feed posts={posts} />, rootElement);
