@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './styles.css';
 import { Feed } from './homepage';
-import { BugForm } from './bugs';
+import { BugPage } from './bugs';
 
 const posts = [
   {
@@ -46,4 +46,4 @@ const posts = [
 ];
 
 const rootElement = document.getElementById('root');
-ReactDOM.render(<Feed posts={posts} />, rootElement);
+ReactDOM.render(<BugPage />, rootElement);

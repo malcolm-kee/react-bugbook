@@ -81,3 +81,38 @@ export const BugForm = () => {
     </div>
   );
 };
+
+export const BugList = () => {
+  const [bugs, setBugs] = React.useState([]);
+  React.useEffect(() => {
+    axios
+      .get('https://bugbook-server.herokuapp.com/bugs')
+      .then(res => setBugs(res.data));
+  }, []);
+
+  return (
+    <div id="bugs-container">
+      {bugs.map(bug => (
+        <article className="card" key={bug.id}>
+          <div className="card-title">{bug.status}</div>
+          <div className="card-content">
+            <p>{bug.title}</p>
+            <i>Reported by {bug.reportedBy}</i>
+          </div>
+        </article>
+      ))}
+      {bugs.length === 0 && <div className="spinner" />}
+    </div>
+  );
+};
+
+export const BugPage = () => {
+  return (
+    <main className="container">
+      <BugList />
+      <div id="bug-form-container">
+        <BugForm />
+      </div>
+    </main>
+  );
+};
