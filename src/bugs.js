@@ -84,11 +84,16 @@ export const BugForm = () => {
 
 export const BugList = () => {
   const [bugs, setBugs] = React.useState([]);
+  const [page, setPage] = React.useState(1);
   React.useEffect(() => {
     axios
-      .get('https://bugbook-server.herokuapp.com/bugs')
-      .then(res => setBugs(res.data));
-  }, []);
+      .get(`https://bugbook-server.herokuapp.com/bugs?_limit=2&_page=${page}`)
+      .then(res => setBugs(bugs.concat(res.data)));
+  }, [page]);
+
+  function loadMore() {
+    setPage(page + 1);
+  }
 
   return (
     <div id="bugs-container">
@@ -102,6 +107,7 @@ export const BugList = () => {
         </article>
       ))}
       {bugs.length === 0 && <div className="spinner" />}
+      <button onClick={loadMore}>Load More</button>
     </div>
   );
 };
