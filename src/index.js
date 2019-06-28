@@ -1,3 +1,4 @@
+import axios from 'axios';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './styles.css';
@@ -96,9 +97,25 @@ const BugForm = () => {
     setStatus('');
   }
 
+  function submit() {
+    axios
+      .post('https://bugbook-server.herokuapp.com/bugs', {
+        title,
+        status,
+        reportedBy: name
+      })
+      .then(() => reset());
+  }
+
   return (
     <div className="card">
-      <form id="bug-form">
+      <form
+        id="bug-form"
+        onSubmit={e => {
+          e.preventDefault();
+          submit();
+        }}
+      >
         <input type="hidden" name="id" id="id" />
         <div className="card-title">Create Issue</div>
         <div className="card-content">
