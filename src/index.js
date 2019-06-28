@@ -43,39 +43,43 @@ const posts = [
   }
 ];
 
-const feed = (
-  <div className="feed">
-    {posts.map(post => {
-      const img = post.post.image ? (
-        <div className="card-image-container">
-          <img
-            className="card-image"
-            src={post.post.image.src}
-            alt={post.post.image.alt}
-          />
-        </div>
-      ) : null;
+const Post = ({ post }) => {
+  const img = post.post.image ? (
+    <div className="card-image-container">
+      <img
+        className="card-image"
+        src={post.post.image.src}
+        alt={post.post.image.alt}
+      />
+    </div>
+  ) : null;
 
-      return (
-        <article className="card post" key={post.id}>
-          <div className="card-title">
-            <a href={post.author.src}>{post.author.name}</a>
-            <button className="focus-btn" type="button">
-              ...
-            </button>
-          </div>
-          <div className="card-content">{post.post.text}</div>
-          {img}
-          <div className="card-actions">
-            <button type="button" className="button">
-              Like
-            </button>
-          </div>
-        </article>
-      );
-    })}
+  return (
+    <article className="card post" key={post.id}>
+      <div className="card-title">
+        <a href={post.author.src}>{post.author.name}</a>
+        <button className="focus-btn" type="button">
+          ...
+        </button>
+      </div>
+      <div className="card-content">{post.post.text}</div>
+      {img}
+      <div className="card-actions">
+        <button type="button" className="button">
+          Like
+        </button>
+      </div>
+    </article>
+  );
+};
+
+const Feed = ({ posts }) => (
+  <div className="feed">
+    {posts.map(post => (
+      <Post post={post} />
+    ))}
   </div>
 );
 
 const rootElement = document.getElementById('root');
-ReactDOM.render(feed, rootElement);
+ReactDOM.render(<Feed posts={posts} />, rootElement);
