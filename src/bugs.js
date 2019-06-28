@@ -1,25 +1,36 @@
 import axios from 'axios';
 import React from 'react';
 
-export const BugForm = () => {
-  const [name, setName] = React.useState('');
-  const [title, setTitle] = React.useState('');
-  const [status, setStatus] = React.useState('');
-
-  function reset() {
-    setName('');
-    setTitle('');
-    setStatus('');
-  }
-
+export const BugForm = ({
+  isEdit,
+  id,
+  name,
+  setName,
+  title,
+  setTitle,
+  status,
+  setStatus,
+  onSuccess,
+  reset
+}) => {
   function submit() {
-    axios
-      .post('https://bugbook-server.herokuapp.com/bugs', {
-        title,
-        status,
-        reportedBy: name
-      })
-      .then(() => reset());
+    if (isEdit) {
+      axios
+        .put(`https://bugbook-server.herokuapp.com/bugs/${id}`, {
+          title,
+          status,
+          reportedBy: name
+        })
+        .then(() => onSuccess());
+    } else {
+      axios
+        .post('https://bugbook-server.herokuapp.com/bugs', {
+          title,
+          status,
+          reportedBy: name
+        })
+        .then(() => onSuccess());
+    }
   }
 
   return (
@@ -32,7 +43,9 @@ export const BugForm = () => {
         }}
       >
         <input type="hidden" name="id" id="id" />
-        <div className="card-title">Create Issue</div>
+        <div className="card-title">
+          {isEdit ? 'Edit Issue' : 'Create Issue'}
+        </div>
         <div className="card-content">
           <div className="form-control">
             <label htmlFor="reportedBy">Your Name</label>
@@ -71,7 +84,7 @@ export const BugForm = () => {
         </div>
         <div className="card-actions">
           <button type="submit" className="btn">
-            Create
+            {isEdit ? 'Save' : 'Create'}
           </button>
           <button onClick={reset} type="reset" className="btn btn-white">
             Cancel
@@ -82,23 +95,11 @@ export const BugForm = () => {
   );
 };
 
-export const BugList = () => {
-  const [bugs, setBugs] = React.useState([]);
-  const [page, setPage] = React.useState(1);
-  React.useEffect(() => {
-    axios
-      .get(`https://bugbook-server.herokuapp.com/bugs?_limit=2&_page=${page}`)
-      .then(res => setBugs(bugs.concat(res.data)));
-  }, [page]);
-
-  function loadMore() {
-    setPage(page + 1);
-  }
-
+export const BugList = ({ onSelect, bugs }) => {
   return (
     <div id="bugs-container">
       {bugs.map(bug => (
-        <article className="card" key={bug.id}>
+        <article onClick={() => onSelect(bug)} className="card" key={bug.id}>
           <div className="card-title">{bug.status}</div>
           <div className="card-content">
             <p>{bug.title}</p>
@@ -107,17 +108,63 @@ export const BugList = () => {
         </article>
       ))}
       {bugs.length === 0 && <div className="spinner" />}
-      <button onClick={loadMore}>Load More</button>
     </div>
   );
 };
 
 export const BugPage = () => {
+  const [bugs, setBugs] = React.useState([]);
+  const loadBugs = () =>
+    axios
+      .get(`https://bugbook-server.herokuapp.com/bugs`)
+      .then(res => setBugs(res.data));
+  React.useEffect(() => {
+    loadBugs();
+  }, []);
+
+  const [name, setName] = React.useState('');
+  const [title, setTitle] = React.useState('');
+  const [status, setStatus] = React.useState('');
+  const [isEdit, setIsEdit] = React.useState(false);
+  const [id, setId] = React.useState(undefined);
+
+  function reset() {
+    setName('');
+    setTitle('');
+    setStatus('');
+    setId(undefined);
+    setIsEdit(false);
+  }
+
+  function selectBug(bug) {
+    setName(bug.reportedBy);
+    setTitle(bug.title);
+    setStatus(bug.status);
+    setIsEdit(true);
+    setId(bug.id);
+  }
+
+  function onSuccess() {
+    loadBugs();
+    reset();
+  }
+
   return (
     <main className="container">
-      <BugList />
+      <BugList bugs={bugs} onSelect={selectBug} />
       <div id="bug-form-container">
-        <BugForm />
+        <BugForm
+          isEdit={isEdit}
+          id={id}
+          name={name}
+          title={title}
+          status={status}
+          setName={setName}
+          setTitle={setTitle}
+          setStatus={setStatus}
+          reset={reset}
+          onSuccess={onSuccess}
+        />
       </div>
     </main>
   );
