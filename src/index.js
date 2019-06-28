@@ -44,15 +44,7 @@ const posts = [
 ];
 
 const Post = ({ post }) => {
-  const img = post.post.image ? (
-    <div className="card-image-container">
-      <img
-        className="card-image"
-        src={post.post.image.src}
-        alt={post.post.image.alt}
-      />
-    </div>
-  ) : null;
+  const [liked, setLiked] = React.useState(false);
 
   return (
     <article className="card post" key={post.id}>
@@ -63,9 +55,21 @@ const Post = ({ post }) => {
         </button>
       </div>
       <div className="card-content">{post.post.text}</div>
-      {img}
+      {post.post.image && (
+        <div className="card-image-container">
+          <img
+            className="card-image"
+            src={post.post.image.src}
+            alt={post.post.image.alt}
+          />
+        </div>
+      )}
       <div className="card-actions">
-        <button type="button" className="button">
+        <button
+          onClick={() => setLiked(!liked)}
+          type="button"
+          className={liked ? 'button button-liked' : 'button'}
+        >
           Like
         </button>
       </div>
